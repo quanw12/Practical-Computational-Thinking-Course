@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Vietnam Discovery Explorer - Explore Vietnam's Beauty</title>
+    
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="app" class="app">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="welcome-message">
+            <div class="welcome-content">
+                <h1>🌟 Vietnam Discovery Explorer</h1>
+                <p>✨ Discover the hidden gems of Vietnam!</p>
+                <p>🏞️ Find amazing attractions, cultural sites, and natural wonders</p>
+                <p>🗺️ Search Vietnamese cities and explore their unique offerings</p>
+                <div class="instructions">
+                    <p><strong>🎯 Click anywhere to begin your Vietnamese adventure!</strong></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Panel -->
+        <div id="search-panel" class="search-panel hidden">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="destination-input" 
+                    placeholder="Enter a Vietnamese destination (e.g., Da Nang, Hue, Nha Trang, Can Tho)"
+                    class="destination-input"
+                />
+                <button id="search-btn" class="search-btn">✨ Explore</button>
+                <button id="back-btn" class="back-btn">🏠 Home</button>
+            </div>
+            <div id="loading" class="loading hidden">🌟 Discovering amazing attractions...</div>
+            <div id="error-message" class="error-message hidden"></div>
+            <div id="results-info" class="results-info hidden"></div>
+        </div>
+
+        <!-- Map Container -->
+        <div id="map" class="hidden"></div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin="">
+    </script>
+    
+    <script>
+        // Application state
+        let map;
+        let destinationMarker;
+        let attractionMarkers = [];
+        
+        // DOM elements
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const searchPanel = document.getElementById('search-panel');
+        const mapContainer = document.getElementById('map');
+        const destinationInput = document.getElementById('destination-input');
+        const searchBtn = document.getElementById('search-btn');
+        const backBtn = document.getElementById('back-btn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+        const resultsInfo = document.getElementById('results-info');
+        
+        // Custom markers
+        const destinationIcon = L.divIcon({
+            html: '📍',
+            className: 'custom-div-icon',
+            iconSize: [60, 60],
+            iconAnchor: [15, 30]
+        });
+        
+        const attractionIcon = L.divIcon({
+            html: '🎯',
+            className: 'custom-div-icon',
+            iconSize: [55, 55],
+            iconAnchor: [12, 25]
+        });
+        
+        // Initialize the app
+        function initApp() {
+            // Show search panel on map directly
+            showMapWithSearch();
+            
+            // Event listeners
+            destinationInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchDestination();
+                }
+            });
+            
+            searchBtn.addEventListener('click', searchDestination);
+            backBtn.addEventListener('click', showWelcomeScreen);
+            
+            // Welcome screen click to show search
+            welcomeScreen.addEventListener('click', function() {
+                showSearchPanel();
+            });
+            
+            // Initialize map (but keep it hidden)
+            initializeMap();
+        }
+        
+        function initializeMap() {
+            if (!map) {
+                map = L.map('map').setView([21.0285, 105.8542], 10); // Default to Hanoi
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+            }
+        }
+        
+        function showMapWithSearch() {
+            if (welcomeScreen) welcomeScreen.classList.add('hidden');
+            searchPanel.classList.remove('hidden');
+            mapContainer.classList.remove('hidden');
+            clearMessages();
+            
+            // Initialize and show map immediately
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+                destinationInput.focus();
+            }, 100);
+        }
+        
+        function showWelcomeScreen() {
+            if (welcomeScreen) {
+                welcomeScreen.classList.remove('hidden');
+                searchPanel.classList.add('hidden');
+                mapContainer.classList.add('hidden');
+                clearMessages();
+                destinationInput.value = '';
+            }
+        }
+        
+        function showSearchPanel() {
+            welcomeScreen.classList.add('hidden');
+            searchPanel.classList.remove('hidden');
+            mapContainer.classList.add('hidden');
+            // Focus on input for better UX
+            setTimeout(() => {
+                destinationInput.focus();
+            }, 100);
+        }
+        
+        function showMapView() {
+            if (welcomeScreen) welcomeScreen.classList.add('hidden');
+            searchPanel.classList.remove('hidden');
+            mapContainer.classList.remove('hidden');
+            
+            // Invalidate size after showing map
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+            }, 100);
+        }
+        
+        async function searchDestination() {
+            const destination = destinationInput.value.trim();
+            
+            if (!destination) {
+                showError('Please enter a destination');
+                return;
+            }
+            
+            setLoading(true);
+            clearMessages();
+            clearMarkers();
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ destination: destination })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data, destination);
+                    showMapView();
+                } else {
+                    showError(data.message || 'Search failed');
+                }
+                
+            } catch (error) {
+                showError('Connection error. Please make sure the Flask server is running on port 5000.');
+                console.error('Search error:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        function displayResults(data, destination) {
+            const { location, attractions } = data;
+            
+            // Show results info
+            resultsInfo.innerHTML = `
+                <div class="success">✅ Found ${attractions.length} attractions near <strong>${destination}</strong></div>
+                <small>📍 Coordinates: ${location.lat.toFixed(4)}, ${location.lon.toFixed(4)}</small>
+            `;
+            resultsInfo.classList.remove('hidden');
+            
+            // Set map center and add destination marker
+            map.setView([location.lat, location.lon], 14);
+            
+            destinationMarker = L.marker([location.lat, location.lon], { icon: destinationIcon })
+                .bindPopup(`<strong>📍 ${destination}</strong><br>Your searched destination`)
+                .addTo(map);
+            
+            // Add attraction markers
+            attractions.forEach((attraction, index) => {
+                const marker = L.marker([attraction.lat, attraction.lon], { icon: attractionIcon })
+                    .bindPopup(`
+                        <strong>🎯 ${attraction.name}</strong><br>
+                        <em>Type:</em> ${attraction.type}<br>
+                        <em>Location:</em> ${attraction.lat.toFixed(4)}, ${attraction.lon.toFixed(4)}
+                    `)
+                    .addTo(map);
+                
+                attractionMarkers.push(marker);
+            });
+            
+            // Fit map to show all markers
+            if (attractions.length > 0) {
+                const group = new L.featureGroup([destinationMarker, ...attractionMarkers]);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+        
+        function clearMarkers() {
+            if (destinationMarker) {
+                map.removeLayer(destinationMarker);
+                destinationMarker = null;
+            }
+            
+            attractionMarkers.forEach(marker => {
+                map.removeLayer(marker);
+            });
+            attractionMarkers = [];
+        }
+        
+        function setLoading(isLoading) {
+            if (isLoading) {
+                loading.classList.remove('hidden');
+                searchBtn.disabled = true;
+                destinationInput.disabled = true;
+            } else {
+                loading.classList.add('hidden');
+                searchBtn.disabled = false;
+                destinationInput.disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = `❌ ${message}`;
+            errorMessage.classList.remove('hidden');
+        }
+        
+        function clearMessages() {
+            errorMessage.classList.add('hidden');
+            resultsInfo.classList.add('hidden');
+        }
+        
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

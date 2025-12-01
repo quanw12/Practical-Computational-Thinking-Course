@@ -1,0 +1,325 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  overflow: hidden;
+}
+
+.app {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+/* Search Panel Styles */
+.search-panel {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 20px;
+  max-width: 500px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto;
+}
+
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.destination-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.destination-input:focus {
+  outline: none;
+  border-color: #007cff;
+  box-shadow: 0 0 0 3px rgba(0, 124, 255, 0.1);
+}
+
+.destination-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.search-btn, .back-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.search-btn {
+  background: linear-gradient(135deg, #007cff 0%, #0056b3 100%);
+  color: white;
+}
+
+.search-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 124, 255, 0.3);
+}
+
+.back-btn {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.search-btn:disabled, .back-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.loading {
+  color: #007cff;
+  font-style: italic;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.error-message {
+  color: #dc3545;
+  font-weight: 600;
+  padding: 10px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.results-info {
+  margin-top: 10px;
+}
+
+.success {
+  color: #155724;
+  font-weight: 600;
+  padding: 10px;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+.results-info small {
+  color: #666;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+/* Welcome Message Styles */
+.welcome-message {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+  background-size: 50px 50px;
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.welcome-content {
+  max-width: 700px;
+  padding: 50px 30px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-content h1 {
+  font-size: 3.5rem;
+  margin-bottom: 25px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+}
+
+.welcome-content p {
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.instructions {
+  margin-top: 35px;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 15px;
+  border-left: 5px solid #ffd700;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.instructions p {
+  margin: 12px 0;
+  font-size: 1.15rem;
+}
+
+.instructions strong {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .search-container {
+    flex-direction: column;
+  }
+  
+  .search-panel {
+    left: 10px;
+    right: 10px;
+    padding: 15px;
+    max-width: none;
+  }
+  
+  .destination-input {
+    min-width: unset;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .search-btn, .back-btn {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+  
+  .welcome-content {
+    padding: 30px 20px;
+    margin: 10px;
+  }
+  
+  .welcome-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .welcome-content p {
+    font-size: 1.1rem;
+  }
+  
+  .instructions {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-panel {
+    left: 5px;
+    right: 5px;
+    padding: 12px;
+  }
+  
+  .welcome-content h1 {
+    font-size: 2rem;
+  }
+  
+  .welcome-content p {
+    font-size: 1rem;
+  }
+  
+  .instructions p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Custom Marker Styles */
+.custom-div-icon {
+  background: none !important;
+  border: none !important;
+  font-size: 20px;
+  text-align: center;
+  line-height: 1;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Map styles */
+.leaflet-container {
+  height: 100vh;
+  width: 100vw;
+  font-family: inherit;
+}
+
+#map {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* Leaflet Popup Customization */
+.leaflet-popup-content {
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.leaflet-popup-content strong {
+  color: #333;
+  font-size: 16px;
+}
+
+.leaflet-popup-content em {
+  color: #666;
+  font-style: normal;
+  font-weight: 600;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "vietnam-discovery-explorer",
+  "version": "1.0.0",
+  "description": "A comprehensive web application for exploring Vietnam's beautiful destinations and discovering amazing points of interest",
+  "main": "src/main.py",
+  "scripts": {
+    "start": "python src/main.py",
+    "dev": "python src/main.py"
+  },
+  "keywords": ["vietnam", "tourism", "exploration", "map", "attractions", "travel"],
+  "author": "Student Project",
+  "license": "MIT",
+  "dependencies": {
+    "-": "^0.0.1",
+    "@types/leaflet": "^1.9.21",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "leaflet": "^1.9.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-leaflet": "^5.0.0",
+    "save": "^2.9.0"
+  }
+}
