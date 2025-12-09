@@ -28,6 +28,7 @@ Repo này chứa các bài lab mà mình đã làm trong môn học, bao gồm:
 - **Lab 5** (Create a website that use OpenStreetMapAPI)
 - **Lab 6** (Improve lab5: Add OpenWeatherAPI)
 - **Lab 7** (Improve lab6: Add translation)
+- **Lab 8** (Improve lab7: Add register / login using Firebase API)
 
 > Các lab sẽ được cập nhật xuyên suốt học kỳ.
 
