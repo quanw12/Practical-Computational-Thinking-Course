@@ -232,3 +232,5 @@ prompt: “kiểm tra tôi file main.py cần cải tiến gì”, dùng để t
 
 **GitHub Copilot**. **Copilot, GitHub via Visual Studio Code**, truy cập 17h 8/12/2025,
 prompt: “kiểm tra tôi xem lỗi gì mà bấm vào login bị crash”, dùng để kiếm lỗi, fix nhanh chóng thêm ID, cấu hình cần thiết để chạy tốt hơn 
+
+**API key**, thêm google-service.json và API 

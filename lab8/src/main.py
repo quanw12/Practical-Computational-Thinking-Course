@@ -11,7 +11,7 @@ NOMINATIM = "https://nominatim.openstreetmap.org"
 UA = {"User-Agent": "VietnamDiscoveryExplorer/1.0 (educational-project; student@university.edu)"}
 RADIUS_M = 5000
 OVERPASS = "https://overpass-api.de/api/interpreter"
-OPENWEATHER_API_KEY = "824729decee2bb89c586721174755ae5"
+OPENWEATHER_API_KEY = ""
 OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5"
 
 app = Flask(__name__)
